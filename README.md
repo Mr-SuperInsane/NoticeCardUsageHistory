@@ -1,0 +1,2 @@
+# NoticeCardUsageHistory
+前日のカードの利用履歴をLINEに送信する

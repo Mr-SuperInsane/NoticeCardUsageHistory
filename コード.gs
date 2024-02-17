@@ -59,8 +59,10 @@ var threads = GmailApp.getInboxThreads();
       }
     }
   }
-  message = '\n\n【'+ Month + '月' + Day + '日】\n\nカードの利用はありませんでした'
-  NoticeToLINE(message);
+  if (parseInt(num) == 0){
+    message = '\n\n【'+ Month + '月' + Day + '日】\n\nカードの利用はありませんでした'
+    NoticeToLINE(message);
+  }
   DeleteTrigger();
   SetTrigger();
 }

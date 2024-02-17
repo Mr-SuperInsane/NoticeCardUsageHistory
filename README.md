@@ -1,8 +1,20 @@
 # NoticeCardUsageHistory
 
-本ソースコードは三菱UFJデビッドカードの使用履歴をGmailから取得しLINE Notifyにより通知するものです。現状のコードではその他のカードに対応していませんのでご自身で適切に修正を加えてください。
+前日のカードの使用履歴をLINEに通知します。
+
+本ソースコードは三菱UFJデビッドカード専用です。その他のカードで利用したい場合はご自身で適切に修正を加えてください。
+
+## 仕様
+
+- SetTrigger() : 次の日の0時1分にGetEmailOnDay()を実行するトリガーを作成する
+- DeleteTrigger() : GetEmailOnDay()を実行するトリガーを全て削除する
+- GetEmailOnDay() : 前日の0時0分と前日の23時59分の時間データを取得し、GetEmail()に引数として時間データを渡し実行する
+- GetEmail() : GetEmailOnDay()から渡された時間内のメール(Gmail)かつカード会社のメールアドレスから送られたメールのみ取得、メッセージを作成しNoticeToLINE()にメッセージを渡し実行する
+- NoticeToLINE() : GetEmail()から渡されたメッセージをLINE Notifyで送信する
 
 ## 共通
+
+カードの使用通知が届くメールアドレスのGoogleアカウントでプロジェクトを作成してください。
 
 72行目にLINE Notifyのアクセストークンを[こちら](https://notify-bot.line.me/ja/)から発行してください。  
 1. "ログイン" をクリック

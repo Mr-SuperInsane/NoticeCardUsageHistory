@@ -31,15 +31,12 @@ function GetEmailOnDay() {
 function GetEmail(startTime, endTime, day) {
   var from = "mail@debit.bk.mufg.j";
 
-  // Get all threads
-  var threads = GmailApp.getInboxThreads();
+var threads = GmailApp.getInboxThreads();
 
-  // Get day for line notify
   var yesterday = new Date(day);
   var Month = yesterday.getMonth()+1;
   var Day = yesterday.getDate(); 
 
-  // Search for threads with a matching sender
   outerloop: for (var i = 0; i < threads.length; i++) {
     var messages = threads[i].getMessages();
 
@@ -75,7 +72,7 @@ function NoticeToLINE(message) {
   var option = {
     'method': 'post',
     'headers': {
-      'Authorization': 'Bearer ' + accessToken, // Add space here
+      'Authorization': 'Bearer ' + accessToken, 
     },
     'payload': {
       'message': message

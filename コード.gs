@@ -29,14 +29,17 @@ function GetEmailOnDay() {
 }
 
 function GetEmail(startTime, endTime, day) {
-  var from = "mail@debit.bk.mufg.j";
+  var from = "mail@debit.bk.mufg.jp";
 
-var threads = GmailApp.getInboxThreads();
+  // Get all threads
+  var threads = GmailApp.getInboxThreads();
 
+  // Get day for line notify
   var yesterday = new Date(day);
   var Month = yesterday.getMonth()+1;
   var Day = yesterday.getDate(); 
-
+  let num = 0;
+  // Search for threads with a matching sender
   outerloop: for (var i = 0; i < threads.length; i++) {
     var messages = threads[i].getMessages();
 
@@ -45,22 +48,27 @@ var threads = GmailApp.getInboxThreads();
       var timestamp = message.getDate();
       if (timestamp >= startTime && timestamp <= endTime) {
         if (message.getFrom() === from){
+          if(num == 0){
+            NoticeToLINE("無駄遣い発表");
+          }
           var body = message.getBody()
           var amountMatch = body.match(/ご利用金額（円）\s*:\s*([\d,]+)/);
           var shopMatch = body.match(/ご利用先\s*:\s*([^\n\r]+)/);
           var amount = amountMatch[1].replace(/,/g, ''); 
           var shop = shopMatch[1].trim();
           var amount = parseInt(amount).toLocaleString();
-          var message = '\n\n【'+ Month + '月' + Day + '日】\n\n利用金額:' + amount + '円\n利用先:' + shop;
+          var message = '【'+ Month + '月' + Day + '日】\n\n利用金額:' + amount + '円\n利用先:' + shop;
           NoticeToLINE(message);
+          num += 1;
         }
       }else{
         break outerloop;
       }
     }
   }
+
   if (parseInt(num) == 0){
-    message = '\n\n【'+ Month + '月' + Day + '日】\n\nカードの利用はありませんでした'
+    message = '【'+ Month + '月' + Day + '日】\n\nカードの利用はありませんでした'
     NoticeToLINE(message);
   }
   DeleteTrigger();
@@ -68,19 +76,25 @@ var threads = GmailApp.getInboxThreads();
 }
 
 function NoticeToLINE(message) {
-  var accessToken = 'LINE NOTIFY ACCESS TOKEN';
-  var lineNotifyApi = 'https://notify-api.line.me/api/notify';
+  var accessToken = "LINE_ACCESS_TOKEN";
+  
+  // 送信先のuserID
+  var userId = "YOUR_LINE_USER_ID";
 
-  var option = {
-    'method': 'post',
-    'headers': {
-      'Authorization': 'Bearer ' + accessToken, 
-    },
-    'payload': {
-      'message': message
-    },
+  var options = {
+    "contentType": "application/json",
+    "method" : "post",
+    "payload" : JSON.stringify({
+      "to" : userId,
+      "messages" : [{
+        "type" : "text",
+        "text" : message
+      }]
+    }),
+    "headers" : {"Authorization" : "Bearer " + accessToken}
   };
-  var response = UrlFetchApp.fetch(lineNotifyApi, option);
+
+  var response = UrlFetchApp.fetch("https://api.line.me/v2/bot/message/push", options);
   if (parseInt(response.getResponseCode()) != 200){
     Logger.log("message:"+message);
     Logger.log(response.getContentText());
